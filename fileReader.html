@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+	<meta charset="UTF-8">
+	<title>展示 JavaScript 線上編輯器, 可讀寫 Client 端文件範例 By Scott</title>
+</head>
+<body>
+	<h3>展示 JavaScript 線上編輯器, 可讀寫 Client 端文件範例</h3>
+	<input type="file" id="fileinput" />
+	<button id="downloadBtn">下載Div內容</button>
+	<!-- Read -->
+	<script>
+		function readSingleFile(evt) {
+			// 在使用者選擇檔案後立即讀取該檔案
+			var f = evt.target.files[0]; 
+
+			if (f) {
+				var r = new FileReader();
+				r.onload = function(e) { 
+					var contents = e.target.result;
+					try{
+						console.log( "Got the file.n" 
+							+"name: " + f.name + "n"
+							+"type: " + f.type + "n"
+							+"size: " + f.size + " bytesn"
+							+ "starts with: " + contents.substr(1, contents.indexOf("n"))
+						);
+					}
+					catch(e){
+						console.log(e);
+					}
+
+					// 輸出
+					console.log(contents);
+
+					// 輸出
+					var div;
+					if(!document.getElementById('result')){
+						div=document.createElement('div');
+						div.id="result"
+						div.textContent=contents;
+						document.body.appendChild(div);
+					}
+					else{
+						div=document.getElementById('result');
+						div.textContent=contents;
+					}
+
+					// debugger;
+				}
+
+				r.readAsText(f);					// 當作 Safe HTML String 讀取
+				// r.readAsArrayBuffer(f);			// 也可以當作 ArrayBuffer 再轉 Blob 提供使用者下載
+			}
+			else {
+				alert("Failed to load file");
+			}
+		};
+
+		document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+	</script>
+
+	<!-- Download -->
+	<script>
+		function downloadSingleFile(evt){
+			var output=document.getElementById('result').textContent;
+			var blob=new Blob([output],{type:'application/x-file-to-save'});			// 讓瀏覽器辨識為可下載的連結, 也可以用 "octet/stream"
+			var url=window.URL.createObjectURL(blob);			// 要使用 Blob URL, 需要有 Domain Name
+
+			// debugger;
+
+			// 不需要把這個元素加入 document
+			var downloadURL=document.createElement('a');
+			downloadURL.href=url;
+			downloadURL.download='myFileName.txt';			// 指定下載檔名
+			downloadURL.click();
+		};
+
+		document.getElementById('downloadBtn').addEventListener('click',downloadSingleFile, false);
+	</script>
+</body>
+</html>
